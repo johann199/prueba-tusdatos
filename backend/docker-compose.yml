@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:14
+    container_name: miseventos_postgres
+    environment:
+      POSTGRES_USER: miseventos_user
+      POSTGRES_PASSWORD: miseventos_2024
+      POSTGRES_DB: mis_eventos_db
+    ports:
+      - "5433:5432" 
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  # Opcional: PostgreSQL Admin (pgAdmin)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: miseventos_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@miseventos.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
