@@ -28,8 +28,8 @@ class Evento(Base):
     modificado = Column(DateTime(timezone=True), server_default=func.now())
     # Relaciones con  usuarios y sesiones
     creador_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    creador = relationship("User", back_populates="responsable_eventos")
-    sesion = relationship("Sesion", back_populates="evento")
+    creador = relationship("User", back_populates="eventos_creados")
+    sesiones = relationship("Sesion", back_populates="evento")
     inscripciones = relationship("RegistroEvento", back_populates="evento")
 
 # Clase que representa las sesiones de un evento.
@@ -60,5 +60,5 @@ class RegistroEvento(Base):
     registrado_en = Column(DateTime(timezone=True), server_default=func.now())
     confirmado = Column(Boolean, default=False)
 
-    user = relationship("User", back_populates="registro_evento")
+    usuario = relationship("User", back_populates="inscripciones")
     evento = relationship("Evento", back_populates="inscripciones")

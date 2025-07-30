@@ -4,6 +4,12 @@ from datetime import datetime
 from app.models.event import EstadosEvento
 
 # Esquemas para Eventos
+
+class UserForEvent(BaseModel):
+    id: int
+    nombre: str
+    class Config:
+        from_attributes = True
 class EventoBase(BaseModel):
     titulo: str
     descripcion: str
@@ -28,7 +34,7 @@ class EventoResponse(EventoBase):
     id: int
     estado: EstadosEvento
     registrado: int
-    creador_id: int
+    creador: UserForEvent
     creado: datetime
     modificado: Optional[datetime] = None
     
@@ -69,8 +75,8 @@ class SesionResponse(SesionBase):
 # Esquemas para Registros
 class RegistroEventoResponse(BaseModel):
     id: int
-    user_id: int
-    evento_id: int
+    user: UserForEvent
+    evento: EventoBase
     registrado_en: datetime
     confirmado: bool
     

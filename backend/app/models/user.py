@@ -15,14 +15,13 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
-    correo = Column(String, unique=True, index=True, nullable=False)
-    pasword = Column(String, nullable=False)
+    email = Column(String, unique=True, index=True, nullable=False)
+    password = Column(String, nullable=False)
     nombre = Column(String)
     role = Column(Enum(Roles), default=Roles.ASISTENTE)
     is_active = Column(Boolean, default=True)
     creado = Column(DateTime(timezone=True), server_default=func.now())
     modificado = Column(DateTime(timezone=True), server_default=func.now())
 
-    eventos = relationship("Evento", back_populates="user")
-    registro_evento = relationship("RegistroEvento", back_populates="user")
-
+    eventos_creados = relationship("Evento", back_populates="creador")
+    inscripciones = relationship("RegistroEvento", back_populates="usuario")
