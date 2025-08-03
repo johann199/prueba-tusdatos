@@ -11,12 +11,11 @@ import {
 } from 'react-bootstrap-icons';
 import './css/SidebarNavbar.css';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../pages/Auth/AuthContex'; 
+import { useAuth } from '../pages/Auth/AuthContex';
 
-
-const SidebarNavbar = ({ children }) => { 
+const SidebarNavbar = ({ children }) => {
   const [show, setShow] = useState(false);
-  const { logout, currentUser } = useAuth(); 
+  const { logout, user } = useAuth();
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -31,14 +30,42 @@ const SidebarNavbar = ({ children }) => {
 
   const SidebarContent = () => (
     <>
+      {/* Información del Usuario */}
+      <div style={{ 
+        borderBottom: '1px solid #dee2e6', 
+        paddingBottom: '1rem', 
+        marginBottom: '1rem',
+        padding: '1rem'
+      }}>
+        {user ? (
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <PersonCircle 
+              size={40} 
+              style={{ color: '#0d6efd', marginRight: '0.75rem' }} 
+            />
+            <div>
+              <div style={{ fontWeight: 'bold', color: '#212529', fontSize: '0.95rem' }}>
+                {user.nombre || user.name || 'Usuario'}
+              </div>
+              <small style={{ color: '#6c757d', fontSize: '0.8rem' }}>
+                {user.email || 'Sin email'}
+              </small>
+            </div>
+          </div>
+        ) : (
+          <div style={{ color: '#dc3545', fontSize: '0.9rem' }}>
+            <PersonCircle size={40} style={{ color: '#6c757d', marginRight: '0.75rem' }} />
+            <span>Usuario no autenticado</span>
+          </div>
+        )}
+      </div>
+
       {/* Header del Sidebar */}
       <div className="sidebar-header">
         <h5 className="mb-0">Eventos</h5>
-        {currentUser && (
-          <small className="text-muted">
-            Bienvenido, {currentUser.nombre || currentUser.email || 'Usuario'}
-          </small>
-        )}
+        <small className="text-muted">
+          Sistema de gestión
+        </small>
       </div>
 
       {/* Menu Items */}
@@ -72,18 +99,18 @@ const SidebarNavbar = ({ children }) => {
   );
 
   return (
-    <div className="d-flex w-100 min-vh-100">{/* Añade w-100 y min-vh-100 para ocupar el espacio */}
+    <div className="d-flex w-100 min-vh-100">
       {/* Botón para mostrar sidebar en móviles */}
       <Button
         variant="outline-primary"
-        className="d-md-none sidebar-toggle position-fixed top-0 start-0 m-3 z-index-1000" // Posiciona el botón
+        className="d-md-none sidebar-toggle position-fixed top-0 start-0 m-3 z-index-1000"
         onClick={handleShow}
       >
         <List />
       </Button>
 
       {/* Sidebar para desktop */}
-      <div className="sidebar d-none d-md-flex flex-column">{/* Añade flex-column */}
+      <div className="sidebar d-none d-md-flex flex-column">
         <SidebarContent />
       </div>
 
@@ -98,8 +125,8 @@ const SidebarNavbar = ({ children }) => {
       </Offcanvas>
 
       {/* Área principal de contenido donde se renderizarán las rutas */}
-      <div className="main-content-area flex-grow-1 p-3 p-md-4"> {/* Añade padding y flex-grow-1 */}
-        {children} {/* <--- ¡Esto es lo crucial! Renderiza los hijos aquí */}
+      <div className="main-content-area flex-grow-1 p-3 p-md-4">
+        {children}
       </div>
     </div>
   );

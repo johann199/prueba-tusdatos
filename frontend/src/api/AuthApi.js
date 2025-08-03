@@ -8,7 +8,6 @@ class AuthApi {
       if (!credentials.email || !credentials.password) {
         throw new Error('Email y contraseña son requeridos');
       }
-
       const formData = new FormData();
       formData.append('username', credentials.email); // FastAPI OAuth2 espera 'username'
       formData.append('password', credentials.password);
@@ -18,14 +17,12 @@ class AuthApi {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
       });
-      
-
-      return response.data;
-    } catch (error) {
-      // Agregar más información si hay respuesta del servidor
-      if (error.response) {
+      // Validar que tenemos los datos necesarios
+      if (!response.data.access_token) {
+        throw new Error('El servidor no devolvió un token de acceso');
       }
-
+      return response.data;
+    } catch (error) {      
       throw error;
     }
   };
@@ -60,16 +57,21 @@ class AuthApi {
   // Verificar si el usuario está autenticado
   static isAuthenticated = () => {
     const token = localStorage.getItem('access_token');
-    return !!token;
+    const isAuth = !!token;
+    return isAuth;
   };
 
   // Obtener token del localStorage
   static getToken = () => {
-    return localStorage.getItem('access_token');
+    const token = localStorage.getItem('access_token');
+    return token;
   };
 
   // Guardar token en localStorage y configurar axios
   static setToken = (token) => {
+    if (!token) {
+      return;
+    }
     localStorage.setItem('access_token', token);
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
   };
@@ -95,7 +97,6 @@ class AuthApi {
       (response) => response,
       (error) => {
         if (error.response?.status === 401) {
-          // Token expirado o inválido
           AuthApi.logout();
           // Redirigir al login o mostrar mensaje
           window.location.href = '/login';

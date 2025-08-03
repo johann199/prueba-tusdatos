@@ -1,7 +1,7 @@
 .sidebar {
   width: 280px;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ebedf5 0%, #c2c2c2 100%);
   color: white;
   padding: 1.5rem 1rem;
   position: fixed;
@@ -19,7 +19,7 @@
 }
 
 .sidebar-header h5 {
-  color: white;
+  color: black;
   font-weight: 600;
 }
 
@@ -29,7 +29,7 @@
 }
 
 .sidebar-item {
-  color: rgba(255, 255, 255, 0.8) !important;
+  color: rgba(0, 0, 0, 0.8) !important;
   text-decoration: none !important;
   padding: 0.75rem 1rem;
   margin-bottom: 0.5rem;
@@ -41,13 +41,13 @@
 
 .sidebar-item:hover {
   background-color: rgba(255, 255, 255, 0.1);
-  color: white !important;
+  color: black !important;
   transform: translateX(5px);
 }
 
 .sidebar-item.active {
   background-color: rgba(255, 255, 255, 0.2);
-  color: white !important;
+  color: black !important;
 }
 
 .sidebar-icon {
@@ -107,12 +107,12 @@
 }
 
 .offcanvas-body {
-  background: linear-gradient(135deg, #667eea 0%, #f8f9fa 100%);
+  background: linear-gradient(135deg, #f8f9fa 0%, #f8f9fa 100%);
   color: white;
 }
 
 .offcanvas-header {
-  background: linear-gradient(135deg, #667eea 0%, #f8f9fa 100%);
+  background: linear-gradient(135deg, #f8f9fa 0%, #f8f9fa 100%);
   color: white;
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }

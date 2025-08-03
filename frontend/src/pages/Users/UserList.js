@@ -90,7 +90,7 @@ const UserList = () => {
             <Table striped hover className="mb-0">
               <thead className="table-dark">
                 <tr>
-                  <th>ID</th>
+                  <th>#</th>
                   <th>Nombre</th>
                   <th>Email</th>
                   <th>Rol</th>
@@ -99,10 +99,10 @@ const UserList = () => {
                 </tr>
               </thead>
               <tbody>
-                {users.map(user => (
+                {users.map((user, index) => (
                   <tr key={user.id}>
                     <td>
-                      <span className="badge bg-secondary">{user.id}</span>
+                      <span className="badge bg-secondary">{index + 1}</span>
                     </td>
                     <td className="fw-medium">{user.nombre}</td>
                     <td>{user.email}</td>

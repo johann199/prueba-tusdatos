@@ -164,7 +164,7 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Error interno del servidor: {str(e)}")
 
-@router.post("/login", response_model=Token,
+@router.post("/login", response_model=dict,
         summary="Iniciar sesión de usuario",
         description="Autentica a un usuario con su correo electrónico y contraseña, devolviendo un token de acceso JWT.",
         response_description="Objeto Token con el token de acceso y tipo 'bearer'.",
@@ -187,6 +187,10 @@ def login_user(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = D
         data={"sub": user.email},
         expires_delta=access_token_expires
     )
-    return {"access_token": access_token, "token_type": "bearer"}
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user": UserResponse.model_validate(user)
+    }
 
 
