@@ -38,7 +38,6 @@ const UserList = () => {
       } catch (error) {
         console.error('Error deleting user:', error);
       }
-
     }
   };
 
@@ -70,63 +69,85 @@ const UserList = () => {
     handleCloseEdit();
   };
 
-  if (loading) return <div>Cargando usuarios...</div>;
-  if (error) return <div>Error: {error}</div>;
+  if (loading) return <div className="text-center p-4">Cargando usuarios...</div>;
+  if (error) return <div className="alert alert-danger m-3">Error: {error}</div>;
 
   return (
-    <Container>
-      <Card>
-        <div className='d-flex justify-content-between align-items-center p-3'>
-          <h2>Lista de Usuarios</h2>
-          <Button variant="primary" onClick={handleShowCreate}>
-            Crear Usuario
+    <Container fluid className="p-0">
+      <Card className="border-0 shadow-sm">
+        <div className='d-flex justify-content-between align-items-center p-4 bg-light border-bottom'>
+          <div>
+            <h2 className="mb-1">Lista de Usuarios</h2>
+            <small className="text-muted">Gestiona los usuarios del sistema</small>
+          </div>
+          <Button variant="primary" onClick={handleShowCreate} className="px-4">
+            + Crear Usuario
           </Button>
         </div>
-        <Card.Body>
-          <Table striped bordered hover>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Email</th>
-                <th>Rol</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map(user => (
-                <tr key={user.id}>
-                  <td>{user.id}</td>
-                  <td>{user.nombre}</td>
-                  <td>{user.email}</td>
-                  <td>{user.role}</td>
-                  <td>
-                    <span className={`status ${user.is_active ? 'active' : 'inactive'}`}>
-                      {user.is_active ? 'Activo' : 'Inactivo'}
-                    </span>
-                  </td>
-                  <td>
-                    <Button 
-                      onClick={() => handleDeleteUser(user.id)}
-                      variant="danger"
-                      className="me-2"
-                      size="sm"
-                    >
-                      Eliminar
-                    </Button>
-                    <Button 
-                      variant="info" 
-                      onClick={() => handleShowEdit(user)}
-                      size="sm"
-                    >
-                      Editar
-                    </Button>
-                  </td>
+        
+        <Card.Body className="p-0">
+          <div className="table-responsive">
+            <Table striped hover className="mb-0">
+              <thead className="table-dark">
+                <tr>
+                  <th>ID</th>
+                  <th>Nombre</th>
+                  <th>Email</th>
+                  <th>Rol</th>
+                  <th>Estado</th>
+                  <th width="200">Acciones</th>
                 </tr>
-              ))}
-            </tbody>
-          </Table>
+              </thead>
+              <tbody>
+                {users.map(user => (
+                  <tr key={user.id}>
+                    <td>
+                      <span className="badge bg-secondary">{user.id}</span>
+                    </td>
+                    <td className="fw-medium">{user.nombre}</td>
+                    <td>{user.email}</td>
+                    <td>
+                      <span className="badge bg-info">{user.role}</span>
+                    </td>
+                    <td>
+                      <span className={`badge ${user.is_active ? 'bg-success' : 'bg-warning'}`}>
+                        {user.is_active ? 'Activo' : 'Inactivo'}
+                      </span>
+                    </td>
+                    <td>
+                      <div className="d-flex gap-2">
+                        <Button 
+                          variant="outline-primary" 
+                          onClick={() => handleShowEdit(user)}
+                          size="sm"
+                          className="flex-fill"
+                        >
+                          Editar
+                        </Button>
+                        <Button 
+                          onClick={() => handleDeleteUser(user.id)}
+                          variant="outline-danger"
+                          size="sm"
+                          className="flex-fill"
+                        >
+                          Eliminar
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </div>
+          
+          {users.length === 0 && (
+            <div className="text-center p-5">
+              <p className="text-muted mb-3">No hay usuarios registrados</p>
+              <Button variant="primary" onClick={handleShowCreate}>
+                Crear primer usuario
+              </Button>
+            </div>
+          )}
         </Card.Body>
       </Card>
 

@@ -8,11 +8,11 @@ const Register = () => {
   const { isLoading } = useAuth();
   
   const [formData, setFormData] = useState({
-    correo: '',
+    email: '',
     nombre: '',
-    pasword: '',
+    password: '',
     confirmPassword: '',
-    role: 'ASISTENTE'
+    role: 'Asistente'
   });
   
   const [errors, setErrors] = useState({});
@@ -21,9 +21,9 @@ const Register = () => {
 
   // Roles disponibles (ajusta según tu enum)
   const ROLES = [
-    { value: 'ASISTENTE', label: 'Asistente' },
-    { value: 'ORGANIZADOR', label: 'Organizador' },
-    { value: 'ADMIN', label: 'Administrador' }
+    { value: 'Asistente', label: 'Asistente' },
+    { value: 'Organizador', label: 'Organizador' },
+    { value: 'Admin', label: 'Administrador' }
   ];
 
   const handleInputChange = (e) => {
@@ -46,10 +46,10 @@ const Register = () => {
     const newErrors = {};
 
     // Validar email
-    if (!formData.correo.trim()) {
-      newErrors.correo = 'El email es obligatorio';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.correo)) {
-      newErrors.correo = 'Ingresa un email válido';
+    if (!formData.email.trim()) {
+      newErrors.email = 'El email es obligatorio';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = 'Ingresa un email válido';
     }
 
     // Validar nombre
@@ -60,16 +60,16 @@ const Register = () => {
     }
 
     // Validar contraseña
-    if (!formData.pasword) {
-      newErrors.pasword = 'La contraseña es obligatoria';
-    } else if (formData.pasword.length < 6) {
-      newErrors.pasword = 'La contraseña debe tener al menos 6 caracteres';
+    if (!formData.password) {
+      newErrors.password = 'La contraseña es obligatoria';
+    } else if (formData.password.length < 6) {
+      newErrors.password = 'La contraseña debe tener al menos 6 caracteres';
     }
 
     // Validar confirmación de contraseña
     if (!formData.confirmPassword) {
       newErrors.confirmPassword = 'Confirma tu contraseña';
-    } else if (formData.pasword !== formData.confirmPassword) {
+    } else if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = 'Las contraseñas no coinciden';
     }
 
@@ -142,21 +142,21 @@ const Register = () => {
                   {/* Email */}
                   <Col md={6}>
                     <Form.Group className="mb-3">
-                      <Form.Label htmlFor="correo">
+                      <Form.Label htmlFor="email">
                         <i className="bi bi-envelope me-2"></i>
                         Email *
                       </Form.Label>
                       <Form.Control
                         type="email"
-                        id="correo"
-                        name="correo"
-                        value={formData.correo}
+                        id="email"
+                        name="email"
+                        value={formData.email}
                         onChange={handleInputChange}
                         placeholder="tu@email.com"
-                        isInvalid={!!errors.correo}
+                        isInvalid={!!errors.email}
                       />
                       <Form.Control.Feedback type="invalid">
-                        {errors.correo}
+                        {errors.email}
                       </Form.Control.Feedback>
                     </Form.Group>
                   </Col>
@@ -188,19 +188,19 @@ const Register = () => {
                   {/* Password */}
                   <Col md={6}>
                     <Form.Group className="mb-3">
-                      <Form.Label htmlFor="pasword">
+                      <Form.Label htmlFor="password">
                         <i className="bi bi-lock me-2"></i>
                         Contraseña *
                       </Form.Label>
                       <div className="position-relative">
                         <Form.Control
                           type={showPassword ? "text" : "password"}
-                          id="pasword"
-                          name="pasword"
-                          value={formData.pasword}
+                          id="password"
+                          name="password"
+                          value={formData.password}
                           onChange={handleInputChange}
                           placeholder="Mínimo 6 caracteres"
-                          isInvalid={!!errors.pasword}
+                          isInvalid={!!errors.password}
                         />
                         <Button
                           variant="link"
@@ -213,7 +213,7 @@ const Register = () => {
                         </Button>
                       </div>
                       <Form.Control.Feedback type="invalid">
-                        {errors.pasword}
+                        {errors.password}
                       </Form.Control.Feedback>
                     </Form.Group>
                   </Col>

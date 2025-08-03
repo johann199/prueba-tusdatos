@@ -11,12 +11,12 @@ import {
 } from 'react-bootstrap-icons';
 import './css/SidebarNavbar.css';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../pages/Auth/AuthContex'; // Importa useAuth para el logout
+import { useAuth } from '../pages/Auth/AuthContex'; 
 
-// Asegúrate de que SidebarNavbar reciba 'children' como prop
-const SidebarNavbar = ({ children }) => { // <--- Añade 'children' aquí
+
+const SidebarNavbar = ({ children }) => { 
   const [show, setShow] = useState(false);
-  const { logout, currentUser } = useAuth(); // Obtén logout y currentUser del contexto
+  const { logout, currentUser } = useAuth(); 
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -25,9 +25,7 @@ const SidebarNavbar = ({ children }) => { // <--- Añade 'children' aquí
     { href: "/dashboard", icon: <House />, label: "Dashboard" },
     { href: "/eventos", icon: <Calendar />, label: "Eventos" },
     { href: "/perfil", icon: <Person />, label: "Mi Perfil" },
-    // Nota: La ruta /configuracion está protegida por rol en App.js
-    // Si un usuario sin rol ADMIN hace clic aquí, ProtectedRoute lo manejará.
-    { href: "/admin", icon: <Gear />, label: "Configuración" }, // Cambiado a /admin para coincidir con App.js
+    { href: "/admin", icon: <Gear />, label: "Configuración" },
     { href: "/usuarios", icon: <PersonCircle />, label: "Usuarios" }
   ];
 
@@ -50,7 +48,7 @@ const SidebarNavbar = ({ children }) => { // <--- Añade 'children' aquí
             key={index}
             to={item.href}
             className="sidebar-item d-flex align-items-center nav-link"
-            onClick={handleClose} // Cierra el offcanvas al hacer clic en un enlace
+            onClick={handleClose}
           >
             <span className="sidebar-icon me-3">{item.icon}</span>
             {item.label}
@@ -64,7 +62,7 @@ const SidebarNavbar = ({ children }) => { // <--- Añade 'children' aquí
           variant="outline-danger"
           size="sm"
           className="w-100 d-flex align-items-center justify-content-center"
-          onClick={logout} // Usa la función logout del contexto
+          onClick={logout}
         >
           <BoxArrowRight className="me-2" />
           Cerrar Sesión
@@ -74,8 +72,7 @@ const SidebarNavbar = ({ children }) => { // <--- Añade 'children' aquí
   );
 
   return (
-    // Contenedor principal para el sidebar y el contenido
-    <div className="d-flex w-100 min-vh-100"> {/* Añade w-100 y min-vh-100 para ocupar el espacio */}
+    <div className="d-flex w-100 min-vh-100">{/* Añade w-100 y min-vh-100 para ocupar el espacio */}
       {/* Botón para mostrar sidebar en móviles */}
       <Button
         variant="outline-primary"
@@ -86,7 +83,7 @@ const SidebarNavbar = ({ children }) => { // <--- Añade 'children' aquí
       </Button>
 
       {/* Sidebar para desktop */}
-      <div className="sidebar d-none d-md-flex flex-column"> {/* Añade flex-column */}
+      <div className="sidebar d-none d-md-flex flex-column">{/* Añade flex-column */}
         <SidebarContent />
       </div>
 

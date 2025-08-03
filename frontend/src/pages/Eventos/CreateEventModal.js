@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Container, Button, Form, Modal, Alert} from 'react-bootstrap';
+import { Modal, Button, Form, Alert, Spinner } from 'react-bootstrap';
 import EventApi from '../../api/EvenApi';
+import EventForm from './EventForm';
 
-const CreateEvent = ({ onClose, onEventCreated }) => {
+const CreateEventModal = ({ onClose, onEventCreated }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     titulo: '',
@@ -11,24 +12,16 @@ const CreateEvent = ({ onClose, onEventCreated }) => {
     fecha_fin: '',
     lugar: '',
     capacidad: '',
-    estado: ''
+    estado: 'Pendiente' // Estado por defecto
   });
-
   const [errors, setErrors] = useState({});
-
-  // Estados disponibles para el evento
-  const ESTADOS = [
-    { value: 'PENDIENTE', label: 'Pendiente' },
-    { value: 'ACTIVO', label: 'Activo' },
-    { value: 'CANCELADO', label: 'Cancelado' },
-    { value: 'FINALIZADO', label: 'Finalizado' }
-  ];
+  const [generalError, setGeneralError] = useState('');
 
   const handleInputChange = (e) => {
     const { name, value, type } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'number' ? parseInt(value) || 0 : value
+      [name]: type === 'number' ? parseInt(value) || '' : value
     }));
 
     // Limpiar error del campo cuando el usuario empiece a escribir
@@ -38,17 +31,22 @@ const CreateEvent = ({ onClose, onEventCreated }) => {
         [name]: ''
       }));
     }
+
+    // Limpiar error general
+    if (generalError) {
+      setGeneralError('');
+    }
   };
 
   const validateForm = () => {
     const newErrors = {};
 
     // Validaciones
-    if (!formData.titulo.trim()) {
+    if (!formData.titulo?.trim()) {
       newErrors.titulo = 'El título es obligatorio';
     }
 
-    if (!formData.descripcion.trim()) {
+    if (!formData.descripcion?.trim()) {
       newErrors.descripcion = 'La descripción es obligatoria';
     }
 
@@ -66,7 +64,7 @@ const CreateEvent = ({ onClose, onEventCreated }) => {
       }
     }
 
-    if (formData.capacidad < 1) {
+    if (!formData.capacidad || formData.capacidad < 1) {
       newErrors.capacidad = 'La capacidad debe ser mayor a 0';
     }
 
@@ -82,9 +80,17 @@ const CreateEvent = ({ onClose, onEventCreated }) => {
     }
 
     setIsLoading(true);
+    setGeneralError('');
     
     try {
-      await EventApi.createEvent(formData);
+      const eventData = {
+        ...formData,
+        capacidad: parseInt(formData.capacidad)
+      };
+      
+      await EventApi.createEvent(eventData);
+      
+      // Resetear formulario
       setFormData({
         titulo: '',
         descripcion: '',
@@ -92,169 +98,52 @@ const CreateEvent = ({ onClose, onEventCreated }) => {
         fecha_fin: '',
         lugar: '',
         capacidad: '',
-        estado: ''
+        estado: 'Pendiente'
       });
 
+      // Notificar éxito y cerrar modal
       onEventCreated();
       
     } catch (error) {
       console.error('Error creating event:', error);
+      setGeneralError(
+        error.response?.data?.message || 
+        'Error al crear el evento. Por favor, inténtalo de nuevo.'
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <Modal show onHide={onClose} size="lg">
+    <Modal show onHide={onClose} size="lg" backdrop="static">
       <Modal.Header closeButton>
         <Modal.Title>Crear Nuevo Evento</Modal.Title>
       </Modal.Header>
-      <Modal.Body>
-        {errors && (
-          <Alert variant="danger" className="mb-3">
-            {Object.values(errors).map((error, index) => (
-              <div key={index}>{error}</div>
-            ))}
-          </Alert>
+      
+      <Form onSubmit={handleSubmit}>
+        <Modal.Body>
+          {generalError && (
+            <Alert variant="danger" className="mb-3">
+              {generalError}
+            </Alert>
           )}
-        <Form onSubmit={handleSubmit} className="space-y-6">
-          {/* Título */}
-          <Container>
-            <Form.Label htmlFor="titulo">
-              Título del Evento *
-            </Form.Label>
-            <Form.Control
-              type="text"
-              id="titulo"
-              name="titulo"
-              value={formData.titulo}
-              onChange={handleInputChange}
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.titulo ? 'border-red-500' : 'border-gray-300'
-              }`}
-              placeholder="Ej: Conferencia de Tecnología 2024"
-            />
-            {errors.titulo && (
-              <p className="text-red-500 text-sm mt-1">{errors.titulo}</p>
-            )}
-          </Container>
 
-          {/* Descripción */}
-          <Container>
-            <Form.Label htmlFor="descripcion" className="block text-sm font-medium text-gray-700 mb-2">
-              Descripción *
-            </Form.Label>
-            <Form.Control
-              as="textarea"
-              id="descripcion"
-              name="descripcion"
-              value={formData.descripcion}
-              onChange={handleInputChange}
-              rows={4}
-              placeholder="Describe el evento, sus objetivos y lo que los asistentes pueden esperar..."
-            />
-            {errors.descripcion && (
-              <p className="text-red-500 text-sm mt-1">{errors.descripcion}</p>
-            )}
-          </Container>
+          <EventForm
+            formData={formData}
+            onChange={handleInputChange}
+            errors={errors}
+            isEditing={false}
+          />
+        </Modal.Body>
 
-          {/* Fechas */}
-          <Container className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Container>
-              <Form.Label htmlFor="fecha_inicio" className="block text-sm font-medium text-gray-700 mb-2">
-                Fecha de Inicio *
-              </Form.Label>
-              <Form.Control
-                type="datetime-local"
-                id="fecha_inicio"
-                name="fecha_inicio"
-                value={formData.fecha_inicio}
-                onChange={handleInputChange}
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  errors.fecha_inicio ? 'border-red-500' : 'border-gray-300'
-                }`}
-              />
-              {errors.fecha_inicio && (
-                <p className="text-red-500 text-sm mt-1">{errors.fecha_inicio}</p>
-              )}
-            </Container>
-
-            <Container>
-              <Form.Label htmlFor="fecha_fin" className="block text-sm font-medium text-gray-700 mb-2">
-                Fecha de Fin *
-              </Form.Label>
-              <Form.Control
-                type="datetime-local"
-                id="fecha_fin"
-                name="fecha_fin"
-                value={formData.fecha_fin}
-                onChange={handleInputChange}
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  errors.fecha_fin ? 'border-red-500' : 'border-gray-300'
-                }`}
-              />
-              {errors.fecha_fin && (
-                <p className="text-red-500 text-sm mt-1">{errors.fecha_fin}</p>
-              )}
-            </Container>
-          </Container>
-
-          {/* Lugar */}
-          <Container>
-            <Form.Label htmlFor="lugar" className="block text-sm font-medium text-gray-700 mb-2">
-              Lugar
-            </Form.Label>
-            <Form.Control
-              type="text"
-              id="lugar"
-              name="lugar"
-              value={formData.lugar}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Ej: Centro de Convenciones, Aula Virtual, etc."
-            />
-          </Container>
-
-          {/* Capacidad y Estado */}
-          <Container className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Container>
-              <Form.Label htmlFor="capacidad" className="block text-sm font-medium text-gray-700 mb-2">
-                Capacidad *
-              </Form.Label>
-              <Form.Control
-                type="number"
-                id="capacidad"
-                name="capacidad"
-                value={formData.capacidad}
-                onChange={handleInputChange}
-                min="1"
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  errors.capacidad ? 'border-red-500' : 'border-gray-300'
-                }`}
-                placeholder="100"
-              />
-              {errors.capacidad && (
-                <p className="text-red-500 text-sm mt-1">{errors.capacidad}</p>
-              )}
-            </Container>
-
-            <Container>
-              <Form.Label htmlFor="estado" className="block text-sm font-medium text-gray-700 mb-2">
-                Estado
-              </Form.Label>
-              <Form.Select>
-                <option value="">Seleccione un estado</option>
-                {ESTADOS.map(estado => (
-                  <option key={estado.value} value={estado.value}>
-                    {estado.label}
-                  </option>
-                ))}
-              </Form.Select>
-            </Container>
-          </Container>
-
-          {/* Botones */}
-          <Container className="flex justify-end gap-3 pt-4 border-t">
+        <Modal.Footer className="d-flex justify-content-between">
+          <div>
+            <small className="text-muted">
+              * Campos obligatorios
+            </small>
+          </div>
+          <div className="d-flex gap-2">
             <Button
               variant="secondary"
               onClick={onClose}
@@ -264,16 +153,23 @@ const CreateEvent = ({ onClose, onEventCreated }) => {
             </Button>
             <Button
               type="submit"
-              disabled={isLoading}
               variant="primary"
+              disabled={isLoading}
             >
-              {isLoading ? 'Creando...' : 'Crear Evento'}
+              {isLoading ? (
+                <>
+                  <Spinner as="span" animation="border" size="sm" className="me-2" />
+                  Creando...
+                </>
+              ) : (
+                'Crear Evento'
+              )}
             </Button>
-          </Container>
-        </Form>
-      </Modal.Body>
+          </div>
+        </Modal.Footer>
+      </Form>
     </Modal>
   );
 };
 
-export default CreateEvent;
+export default CreateEventModal;

@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Button, Table } from 'react-bootstrap';
+import { Container, Button, Table, Card, Badge, ProgressBar } from 'react-bootstrap';
 import {
   Person,
   Calendar,
+  GeoAlt,
+  Plus
 } from 'react-bootstrap-icons';
 import CreateEventModal from './CreateEventModal';
 import EditEventModal from './EditEventModal';
@@ -12,7 +14,6 @@ import RegisterEventModal from './RegisterEventModal';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const EventList = () => {
-
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -23,18 +24,16 @@ const EventList = () => {
 
   // Estados posibles del evento
   const ESTADOS = {
-    PENDIENTE: 'Pendiente',
-    ACTIVO: 'Activo',
-    CANCELADO: 'Cancelado',
-    FINALIZADO: 'Finalizado'
+    'Pendiente': 'Pendiente',
+    'En curso': 'En curso', 
+    'Cancelado': 'Cancelado',
+    'Finalizado': 'Finalizado'
   };
 
   const loadEvents = async () => {
     try {
       setLoading(true);
       const response = await EventApi.fetchEvents();
-      // Es crucial verificar la estructura de response.data aquí.
-      // Por ejemplo, puedes hacer un console.log(response.data) para verla.
       setEvents(response.data);
     } catch (error) {
       console.error('Error loading events:', error);
@@ -60,22 +59,21 @@ const EventList = () => {
     });
   };
 
-  const getStatusColor = (estado) => {
-    // Normaliza el estado a mayúsculas para que coincida con las claves de ESTADOS
-    const normalizedEstado = (estado || '').toUpperCase();
-    const colors = {
-      PENDIENTE: 'bg-yellow-100 text-yellow-800',
-      ACTIVO: 'bg-green-100 text-green-800',
-      CANCELADO: 'bg-red-100 text-red-800',
-      FINALIZADO: 'bg-gray-100 text-gray-800'
+  const getStatusVariant = (estado) => {
+    const variants = {
+      'Pendiente': 'warning',
+      'En curso': 'success', 
+      'Cancelado': 'danger',
+      'Finalizado': 'secondary'
     };
-    return colors[normalizedEstado] || 'bg-gray-100 text-gray-800'; // Color por defecto
+    return variants[estado] || 'secondary';
   };
 
   const handleEdit = (event) => {
     setSelectedEvent(event);
     setShowEditModal(true);
   };
+
   const handleCloseEdit = () => {
     setShowEditModal(false);
     setSelectedEvent(null);
@@ -128,147 +126,156 @@ const EventList = () => {
     handleCloseRegister();
   };
 
+  const getCapacityPercentage = (registrado, capacidad) => {
+    if (!capacidad || capacidad === 0) return 0;
+    return Math.min((registrado / capacidad) * 100, 100);
+  };
+
   if (loading) {
-    return (
-      <Container className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </Container>
-    );
+    return <div className="text-center p-4">Cargando eventos...</div>;
   }
 
   return (
-    <Container className="p-6">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Gestión de Eventos</h1>
-          <p className="text-gray-600 mt-1">Administra todos los eventos del sistema</p>
+    <Container fluid className="p-0">
+      <Card className="border-0 shadow-sm">
+        <div className='d-flex justify-content-between align-items-center p-4 bg-light border-bottom'>
+          <div>
+            <h2 className="mb-1">Gestión de Eventos</h2>
+            <small className="text-muted">Administra todos los eventos del sistema</small>
+          </div>
+          <Button 
+            variant="primary" 
+            onClick={() => setShowCreateModal(true)} 
+            className="px-4"
+          >
+            <Plus className="me-2" size={16} />
+            Crear Evento
+          </Button>
         </div>
-        <Button
-          onClick={() => setShowCreateModal(true)}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
-        >
-          Crear Evento
-        </Button>
-      </div>
-      {/* Table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <div className="overflow-x-auto">
-          <Table className="min-w-full divide-y divide-gray-200"> {/* Corregido Containeride-y a divide-y */}
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Evento
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Fecha y Hora
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Lugar
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Capacidad
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Estado
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Creador
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Acciones
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200"> {/* Corregido Containeride-y a divide-y */}
-              {events.map((event) => (
-                <tr key={event.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4">
-                    <div>
-                      <div className="text-sm font-medium text-gray-900">
-                        {event.titulo}
-                      </div>
-                      <div className="text-sm text-gray-500 truncate max-w-xs">
-                        {event.descripcion}
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    <div className="flex items-center gap-1">
-                      <Calendar size={16} className="text-gray-400" />
+        
+        <Card.Body className="p-0">
+          <div className="table-responsive">
+            <Table striped hover className="mb-0">
+              <thead className="table-dark">
+                <tr>
+                  <th>ID</th>
+                  <th>Evento</th>
+                  <th>Fecha</th>
+                  <th>Lugar</th>
+                  <th>Capacidad</th>
+                  <th>Estado</th>
+                  <th>Creador</th>
+                  <th width="300">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {events.map((event) => (
+                  <tr key={event.id}>
+                    <td>
+                      <Badge bg="secondary">{event.id}</Badge>
+                    </td>
+                    <td>
                       <div>
-                        <div>{formatDate(event.fecha_inicio)}</div>
-                        <div className="text-xs text-gray-500">
-                          hasta {formatDate(event.fecha_fin)}
+                        <div className="fw-medium">{event.titulo}</div>
+                        <small className="text-muted">
+                          {event.descripcion?.substring(0, 50)}
+                          {event.descripcion?.length > 50 ? '...' : ''}
+                        </small>
+                      </div>
+                    </td>
+                    <td>
+                      <div className="d-flex align-items-center">
+                        <Calendar size={14} className="text-muted me-2" />
+                        <div>
+                          <div className="small">{formatDate(event.fecha_inicio)}</div>
+                          <small className="text-muted">
+                            hasta {formatDate(event.fecha_fin)}
+                          </small>
                         </div>
                       </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    <div className="flex items-center gap-1">
-                      <span className="max-w-xs truncate">{event.lugar}</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    <div className="flex items-center gap-1">
-                      <Person size={16} className="text-gray-400" />
-                      <span>{event.registrado}/{event.capacidad}</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
-                      <div
-                        className="bg-blue-600 h-2 rounded-full"
-                        style={{
-                          width: `${Math.min((event.registrado / event.capacidad) * 100, 100)}%`
-                        }}
-                      ></div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(event.estado)}`}>
-                      {ESTADOS[(event.estado || '').toUpperCase()] || event.estado || 'Desconocido'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {event.creador?.nombre || event.creador_id || 'N/A'}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        onClick={() => handleRegister(event)}
-                        variant="success"
-                        title="Registrarme en el evento"
-                      >
-                        Registrarme
-                      </Button>
-                      <Button
-                        onClick={() => handleViewDetails(event)}
-                        variant="secondary"
-                        title="Ver detalles"
-                      >
-                        Detalles
-                      </Button>
-                      <Button
-                        onClick={() => handleEdit(event)}
-                        variant="info"
-                        title="Editar"
-                      >
-                        Editar
-                      </Button>
-                      <Button
-                        onClick={() => handleDelete(event.id)}
-                        variant="danger"
-                        title="Eliminar"
-                      >
-                        Eliminar
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
-        </div>
-      </div>
+                    </td>
+                    <td>
+                      <div className="d-flex align-items-center">
+                        <GeoAlt size={14} className="text-muted me-2" />
+                        <span className="small">
+                          {event.lugar?.substring(0, 20)}
+                          {event.lugar?.length > 20 ? '...' : ''}
+                        </span>
+                      </div>
+                    </td>
+                    <td>
+                      <div className="d-flex align-items-center mb-1">
+                        <Person size={14} className="text-muted me-2" />
+                        <small>{event.registrado || 0}/{event.capacidad || 0}</small>
+                      </div>
+                      <ProgressBar 
+                        now={getCapacityPercentage(event.registrado, event.capacidad)} 
+                        size="sm"
+                        variant={getCapacityPercentage(event.registrado, event.capacidad) > 80 ? 'warning' : 'primary'}
+                      />
+                    </td>
+                    <td>
+                      <Badge bg={getStatusVariant(event.estado)}>
+                        {ESTADOS[event.estado] || event.estado || 'Desconocido'}
+                      </Badge>
+                    </td>
+                    <td>
+                      <small>{event.creador?.nombre || event.creador_id || 'N/A'}</small>
+                    </td>
+                    <td>
+                      <div className="d-flex gap-1 flex-wrap">
+                        <Button
+                          onClick={() => handleRegister(event)}
+                          variant="outline-success"
+                          size="sm"
+                          title="Registrarme"
+                        >
+                          Registrar
+                        </Button>
+                        <Button
+                          onClick={() => handleViewDetails(event)}
+                          variant="outline-info"
+                          size="sm"
+                          title="Ver detalles"
+                        >
+                          Detalles
+                        </Button>
+                        <Button
+                          onClick={() => handleEdit(event)}
+                          variant="outline-primary"
+                          size="sm"
+                          title="Editar"
+                        >
+                          Editar
+                        </Button>
+                        <Button
+                          onClick={() => handleDelete(event.id)}
+                          variant="outline-danger"
+                          size="sm"
+                          title="Eliminar"
+                        >
+                          Eliminar
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </div>
+          
+          {events.length === 0 && (
+            <div className="text-center p-5">
+              <Calendar size={48} className="text-muted mb-3" />
+              <p className="text-muted mb-3">No hay eventos registrados</p>
+              <Button variant="primary" onClick={() => setShowCreateModal(true)}>
+                <Plus className="me-2" size={16} />
+                Crear primer evento
+              </Button>
+            </div>
+          )}
+        </Card.Body>
+      </Card>
 
       {/* Modales */}
       {showCreateModal && (
@@ -295,7 +302,7 @@ const EventList = () => {
         show={showRegisterModal}
         onHide={handleCloseRegister}
         event={selectedEvent}
-        onRegistrationSuccess={handleEventRegistered} // Pasa la función de éxito
+        onRegistrationSuccess={handleEventRegistered}
       />
     </Container>
   );
