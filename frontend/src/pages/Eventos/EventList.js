@@ -4,7 +4,12 @@ import {
   Person,
   Calendar,
   GeoAlt,
-  Plus
+  Plus,
+  CalendarX,
+  Calendar2Check,
+  Calendar2PlusFill,
+  PencilSquare,
+  FileEarmarkText,
 } from 'react-bootstrap-icons';
 import CreateEventModal from './CreateEventModal';
 import EditEventModal from './EditEventModal';
@@ -148,7 +153,7 @@ const EventList = () => {
             onClick={() => setShowCreateModal(true)} 
             className="px-4"
           >
-            <Plus className="me-2" size={16} />
+            <Calendar2PlusFill className="me-2" size={20} />
             Crear Evento
           </Button>
         </div>
@@ -210,8 +215,8 @@ const EventList = () => {
                       </div>
                       <ProgressBar 
                         now={getCapacityPercentage(event.registrado, event.capacidad)} 
-                        size="sm"
-                        variant={getCapacityPercentage(event.registrado, event.capacidad) > 80 ? 'warning' : 'primary'}
+                        size="sm" striped
+                        variant={getCapacityPercentage(event.registrado, event.capacidad) > 80 ? 'warning' : 'info'}
                       />
                     </td>
                     <td>
@@ -230,7 +235,7 @@ const EventList = () => {
                           size="sm"
                           title="Registrarme"
                         >
-                          Registrar
+                          <Calendar2Check className="me-2" size={16} />
                         </Button>
                         <Button
                           onClick={() => handleViewDetails(event)}
@@ -238,7 +243,7 @@ const EventList = () => {
                           size="sm"
                           title="Ver detalles"
                         >
-                          Detalles
+                          <FileEarmarkText className="me-2" size={16} />
                         </Button>
                         <Button
                           onClick={() => handleEdit(event)}
@@ -246,7 +251,7 @@ const EventList = () => {
                           size="sm"
                           title="Editar"
                         >
-                          Editar
+                          <PencilSquare className="me-2" size={16} />
                         </Button>
                         <Button
                           onClick={() => handleDelete(event.id)}
@@ -254,7 +259,7 @@ const EventList = () => {
                           size="sm"
                           title="Eliminar"
                         >
-                          Eliminar
+                           <CalendarX className="me-2" size={16} />
                         </Button>
                       </div>
                     </td>

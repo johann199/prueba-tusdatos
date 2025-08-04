@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Container, Card, Button, Table } from 'react-bootstrap';
+import {PersonFillX, PersonGear, PersonAdd} from 'react-bootstrap-icons';
 import UserApi from '../../api/UserApi';
 import CreateUserModal from '../Users/CreateUserModal';
 import EditUserModal from '../Users/EditUserModal';
@@ -80,8 +81,8 @@ const UserList = () => {
             <h2 className="mb-1">Lista de Usuarios</h2>
             <small className="text-muted">Gestiona los usuarios del sistema</small>
           </div>
-          <Button variant="primary" onClick={handleShowCreate} className="px-4">
-            + Crear Usuario
+          <Button variant="primary" onClick={handleShowCreate} className="px-4" title='Crear Usuario'>
+            <PersonAdd className="me-2" size={20} />
           </Button>
         </div>
         
@@ -121,16 +122,18 @@ const UserList = () => {
                           onClick={() => handleShowEdit(user)}
                           size="sm"
                           className="flex-fill"
+                          title='Editar Usuario'
                         >
-                          Editar
+                          <PersonGear className="me-2" size={16} />
                         </Button>
                         <Button 
                           onClick={() => handleDeleteUser(user.id)}
                           variant="outline-danger"
                           size="sm"
                           className="flex-fill"
+                          title='Eliminar Usuario'
                         >
-                          Eliminar
+                          <PersonFillX className="me-2" size={16} />
                         </Button>
                       </div>
                     </td>

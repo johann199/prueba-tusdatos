@@ -5,7 +5,7 @@ import {
   Person,
   Calendar,
   Gear,
-  BoxArrowRight,
+  PersonWalking,
   List,
   PersonCircle
 } from 'react-bootstrap-icons';
@@ -40,8 +40,8 @@ const SidebarNavbar = ({ children }) => {
         {user ? (
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <PersonCircle 
-              size={40} 
-              style={{ color: '#0d6efd', marginRight: '0.75rem' }} 
+              size={40}
+              style={{ color: '#6c757d', marginRight: '0.75rem' }}
             />
             <div>
               <div style={{ fontWeight: 'bold', color: '#212529', fontSize: '0.95rem' }}>
@@ -91,7 +91,7 @@ const SidebarNavbar = ({ children }) => {
           className="w-100 d-flex align-items-center justify-content-center"
           onClick={logout}
         >
-          <BoxArrowRight className="me-2" />
+          <PersonWalking size={20} className="me-2" />
           Cerrar Sesión
         </Button>
       </div>

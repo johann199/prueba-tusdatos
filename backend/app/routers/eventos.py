@@ -301,3 +301,22 @@ def evento_usuario(
     ).filter(RegistroEvento.id == new_registration.id).first()
     
     return db_registration_with_details
+
+@router.get("/mis/registros", response_model=List[RegistroEventoResponse], 
+            summary="Obtener registros de eventos del usuario",
+            description="Recupera una lista de todos los eventos en los que el usuario autenticado está registrado.",
+            response_description="Lista de objetos RegistroEventoResponse de los registros del usuario.",
+            responses={
+                status.HTTP_200_OK: {"description": "Registros recuperados exitosamente."},
+                status.HTTP_401_UNAUTHORIZED: {"description": "No autenticado."}
+            })
+def get_mis_registros(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Obtener registros de eventos del usuario autenticado"""
+    registros = db.query(RegistroEvento).options(
+        joinedload(RegistroEvento.evento)
+    ).filter(RegistroEvento.user_id == current_user.id).all()
+    
+    return registros

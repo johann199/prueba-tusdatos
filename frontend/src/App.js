@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard/Dashboard';
 import Eventos from './pages/Eventos/EventList';
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
+import Perfil from './pages/Perfil/Perfil';
 import { AuthProvider, useAuth } from './pages/Auth/AuthContex';
 import { Spinner } from 'react-bootstrap';
 import React from 'react';
@@ -53,6 +54,7 @@ const AppContent = () => {
         <Routes>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/eventos" element={<Eventos />} />
+          <Route path="/perfil" element={<Perfil />} />
           <Route path="/usuarios" element={<UserList />} />
           
           {/* Redirigir login/register al dashboard si ya está autenticado */}
